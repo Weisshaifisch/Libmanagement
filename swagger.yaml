@@ -1,0 +1,449 @@
+swagger: '2.0'
+
+info:
+  description: This is a RESTful library management API specification.
+  version: 1.0.0
+  title: Library Management API
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+
+host: 'localhost:8080'
+basePath: /api
+
+schemes:
+  - http
+
+paths:
+
+  /users:
+    post:
+      summary: Create a new user
+      tags: 
+        - users
+      operationId: createUser
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: request
+          description: new user object that needs to be added to the list of users
+          required: true
+          schema:
+            $ref: '#/definitions/CreateUserRequest'
+      responses:
+        '201':
+          description: successfully created a new user
+        '400':
+          description: user create request failed validation
+    get:
+      summary: Find all existing users
+      tags: 
+        - users
+      operationId: findAllUsers
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: successfully found all users
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/UserResponse'
+
+  '/users/{userId}':
+    get:
+      summary: Find a user
+      tags: 
+        - users
+      operationId: findUserById
+      produces:
+        - application/json
+      parameters:
+        - name: userId
+          in: path
+          description: user id
+          required: true
+          type: number
+      responses:
+        '200':
+          description: successfully found a user
+          schema:
+            $ref: '#/definitions/UserResponse'
+        '404':
+          description: user not found
+    patch:
+      summary: Update a user
+      tags: 
+        - users
+      operationId: updateUser
+      consumes:
+        - application/json
+      parameters:
+        - name: userId
+          in: path
+          description: user id
+          required: true
+          type: number
+        - name: request
+          in: body
+          description: user update request
+          required: true
+          schema:
+            $ref: '#/definitions/UpdateUserRequest'
+      responses:
+        '200':
+          description: user was successfully updated
+        '400':
+          description: user update request failed validation
+        '404':
+          description: user not found
+    delete:
+      summary: Delete user
+      tags: 
+        - users
+      operationId: deleteUser
+      parameters:
+        - name: userId
+          in: path
+          description: user id
+          required: true
+          type: number
+      responses:
+        '204':
+          description: >-
+            successfully deleted a user or user with the given id did not exist
+  
+  '/users/{userId}/loans':
+    get:
+      summary: Find books loaned by a user within a specified interval or all books otherwise
+      tags: 
+        - users
+      operationId: findLoanedBooksByUser
+      produces:
+        - application/json
+      parameters:
+        - name: userId
+          in: path
+          description: user id
+          required: true
+          type: number
+        - name: start
+          in: query
+          description: start date of the interval
+          required: false
+          type: number
+        - name: end
+          in: query
+          description: end date of the interval
+          required: false
+          type: number
+      responses:
+        '200':
+          description: successfully found books loaned by a user
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/LoanResponse'
+              
+  /books:
+    post:
+      summary: Create a new book
+      tags: 
+        - books
+      operationId: createBook
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: request
+          description: new user object that needs to be added to the list of users
+          required: true
+          schema:
+            $ref: '#/definitions/CreateBookRequest'
+      responses:
+        '201':
+          description: successfully created a new book
+        '400':
+          description: book create request failed validation
+    get:
+      summary: Find all existing books
+      tags: 
+        - books
+      operationId: findAllBooks
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: successfully found all books
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/BookResponse'
+  
+  '/books/{bookId}':
+    get:
+      summary: Find a book
+      tags: 
+        - books
+      operationId: findBookById
+      produces:
+        - application/json
+      parameters:
+        - name: bookId
+          in: path
+          description: book id
+          required: true
+          type: number
+      responses:
+        '200':
+          description: successfully found a book
+          schema:
+            $ref: '#/definitions/BookResponse'
+        '404':
+          description: book not found
+    patch:
+      summary: Update a book
+      tags: 
+        - books
+      operationId: updateBook
+      consumes:
+        - application/json
+      parameters:
+        - name: bookId
+          in: path
+          description: book id
+          required: true
+          type: number
+        - name: request
+          in: body
+          description: book update request
+          required: true
+          schema:
+            $ref: '#/definitions/UpdateBookRequest'
+      responses:
+        '200':
+          description: book was successfully updated
+        '400':
+          description: book update request failed validation
+        '404':
+          description: book not found
+    delete:
+      summary: Delete book
+      tags: 
+        - books
+      operationId: deleteBook
+      parameters:
+        - name: bookId
+          in: path
+          description: book id
+          required: true
+          type: number
+      responses:
+        '204':
+          description: >-
+            successfully deleted a book or book with the given id did not exist
+
+  /loans:
+    get:
+      summary: Find all loaned books 
+      tags: 
+        - loans
+      operationId: findAllLoans
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: successfully found all loaned books
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/LoanResponse'
+
+  '/loans/{loanId}':
+    get:
+      summary: Find a loan
+      tags: 
+        - loans
+      operationId: findLoanById
+      produces:
+        - application/json
+      parameters:
+        - name: loanId
+          in: path
+          description: loan id
+          required: true
+          type: number
+      responses:
+        '200':
+          description: successfully found a loan
+          schema:
+            $ref: '#/definitions/LoanResponse'
+        '404':
+          description: loan not found
+  
+  '/loans/loanbook':
+    post:
+      summary: Loan a book
+      tags: 
+        - loans
+      operationId: loanBook
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: request
+          description: unique id of a user and a book to be loaned
+          required: true
+          schema:
+            $ref: '#/definitions/BookManageRequest'
+      responses:
+        '200':
+          description: successfully loaned a book
+        '400':
+          description: book create request failed validation
+        '404':
+          description: either user or book was not found
+
+  '/loans/returnbook':
+    post:
+      summary: Return a book
+      tags: 
+        - loans
+      operationId: returnBook
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: request
+          description: unique id of a user and a book to be returned
+          required: true
+          schema:
+            $ref: '#/definitions/BookManageRequest'
+      responses:
+        '200':
+          description: successfully returned a book
+        '404':
+          description: either user or book was not found
+      
+
+definitions:
+  CreateUserRequest:
+    type: object
+    required:
+      - name
+      - sex
+      - age
+    properties:
+      name:
+        type: string
+      sex:
+        type: string
+      age:
+        type: integer
+  UpdateUserRequest:
+    type: object
+    properties:
+      name:
+        type: string
+      age:
+        type: integer
+  CreateBookRequest:
+    type: object
+    required:
+      - title
+      - yearIssued
+      - numberOfCopies
+      - authors
+    properties:
+      title:
+        type: string
+      yearIssued:
+        type: integer
+      numberOfCopies:
+        type: integer
+      authors:
+        type: array
+        items:
+          type: string
+  UpdateBookRequest:
+    type: object
+    properties:
+      title:
+        type: string
+      yearIssued:
+        type: integer
+      numberOfCopies:
+        type: integer
+      authors:
+        type: array
+        items:
+          type: string
+  BookManageRequest:
+    type: object
+    required:
+      - userId
+      - bookId
+    properties:
+      userId:
+        type: integer
+      bookId:
+        type: integer
+  UserResponse:
+    type: object
+    required:
+      - id
+      - name
+      - sex
+      - age
+    properties:
+      id:
+        type: number
+      name:
+        type: string
+      sex:
+        type: string
+      age:
+        type: integer
+  LoanResponse:
+    type: object
+    required:
+      - id
+      - userName
+      - bookTitle
+      - borrowDate
+      - returnDate
+    properties:
+      id:
+        type: number
+      userName:
+        type: string
+      bookTitle:
+        type: string
+      borrowDate:
+        type: object
+        format: date-time
+      returnDate:
+        type: object
+        format: date-time
+  BookResponse:
+    type: object
+    required:
+      - id
+      - title
+      - yearIssued
+      - numberOfCopies
+      - authors
+    properties:
+      id:
+        type: number
+      title:
+        type: string
+      yearIssued:
+        type: integer
+      numberOfCopies:
+        type: integer
+      authors:
+        type: array
+        items:
+          type: string
